@@ -1,16 +1,18 @@
 package tasklist
 
-import "main/task"
+import (
+	"main/task"
+)
 
 type Tasklist struct {
-	first *tasknode
+	first *Tasknode
 }
 
-type tasknode struct {
+type Tasknode struct {
 	task task.Task
 	sub  *Tasklist
-	prev *tasknode
-	next *tasknode
+	prev *Tasknode
+	next *Tasknode
 }
 
 func New() *Tasklist {
@@ -20,19 +22,19 @@ func New() *Tasklist {
 
 func (tl *Tasklist) Append(t task.Task) {
 	//make a node
-	nn := tasknode{}
+	nn := Tasknode{}
 	nn.task = t
 
 	//connect the node
 	if tl.first == nil {
 		tl.first = &nn
 	} else {
-		tl.last().next = &nn
 		nn.prev = tl.last()
+		tl.last().next = &nn
 	}
 }
 
-func (tl *Tasklist) Del(node *tasknode) {
+func (tl *Tasklist) Del(node *Tasknode) {
 	if node != nil {
 		node.prev.next = node.next
 		node.next.prev = node.prev
@@ -53,14 +55,21 @@ func (tl *Tasklist) Len() int {
 	return i
 }
 
-func (tl *Tasklist) Swap(i1 int, i2 int) {
-	if i1 < 0 || i2 < 0 || i1 >= tl.Len() || i2 >= tl.Len() {
+func (tl *Tasklist) Swap(node *Tasknode, up bool) {
+	if node == nil {
 		return
 	}
 
-	tmp := tl.nodeAt(i1).task
-	tl.nodeAt(i1).task = tl.nodeAt(i2).task
-	tl.nodeAt(i2).task = tmp
+	if up && node.prev != nil {
+		tmp := node.task
+		node.task = node.prev.task
+		node.prev.task = tmp
+
+	} else if !up && node.next != nil {
+		tmp := node.next.task
+		node.next.task = node.task
+		node.task = tmp
+	}
 }
 
 func (tl *Tasklist) At(index int) *task.Task {
@@ -74,7 +83,7 @@ func (tl *Tasklist) At(index int) *task.Task {
 	return &node.task
 }
 
-func (tl *Tasklist) nodeAt(index int) *tasknode {
+func (tl *Tasklist) NodeAt(index int) *Tasknode {
 	i := 0
 	node := tl.first
 	for node != nil && i < index {
@@ -85,7 +94,7 @@ func (tl *Tasklist) nodeAt(index int) *tasknode {
 	return node
 }
 
-func (tl *Tasklist) last() *tasknode {
+func (tl *Tasklist) last() *Tasknode {
 	node := tl.first
 	for node.next != nil {
 		node = node.next

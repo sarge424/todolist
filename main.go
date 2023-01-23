@@ -22,7 +22,7 @@ var line int
 
 var mode int //0 for view, 1 for edit
 var inp []byte
-var selected task.Task
+var selected *tasklist.Tasknode
 
 func init() {
 	tl = tasklist.New()
@@ -31,6 +31,7 @@ func init() {
 
 	w, h = consolesize.GetConsoleSize()
 	line = 0
+	selected = nil
 
 }
 
@@ -47,16 +48,18 @@ func main() {
 			} else {
 				if key.String() == "up" && line > 0 {
 					line--
+					selected = tl.NodeAt(line)
 					refresh()
 				} else if key.String() == "down" && line < tl.Len() {
 					line++
+					selected = tl.NodeAt(line)
 					refresh()
 				} else if key.String() == "shift+up" && line > 0 {
-					tl.Swap(line, line-1)
+					tl.Swap(selected, true)
 					line--
 					refresh()
 				} else if key.String() == "shift+down" && line < tl.Len()-1 {
-					tl.Swap(line, line+1)
+					tl.Swap(selected, false)
 					line++
 					refresh()
 				} else if key.String() == "left" && line < tl.Len() {
@@ -69,7 +72,7 @@ func main() {
 					tl.At(line).Toggle()
 					refresh()
 				} else if key.String() == "backspace" && line < tl.Len() {
-					tl.Del(line)
+					tl.Del(selected)
 					refresh()
 				} else if key.String() == "enter" {
 					startInput()
@@ -111,6 +114,7 @@ func main() {
 						color.Set(color.FgWhite, color.BgBlack)
 						mode = 0
 						line++
+						selected = tl.NodeAt(line)
 						cursor.Hide()
 						refresh()
 					} else if line == tl.Len() {
@@ -119,6 +123,7 @@ func main() {
 
 							color.Set(color.FgWhite, color.BgBlack)
 							line++
+							selected = tl.NodeAt(line)
 							refresh()
 
 							startInput()
