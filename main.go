@@ -62,12 +62,7 @@ func main() {
 					tl.Del(line)
 					refresh()
 				} else if key.String() == "enter" {
-					cursor.Up(tl.Len() - line + 1)
-					color.Set(color.FgBlack, color.BgWhite)
-					fillLine()
-					cursor.Left(w - 1)
-					fmt.Printf("[ ]%d: ", line)
-					cursor.Show()
+					startInput()
 
 					inp = nil
 					mode = 1
@@ -92,19 +87,32 @@ func main() {
 				if key.String() == "enter" {
 					if line < tl.Len() {
 						tl.At(line).SetText(string(inp))
+
+						color.Set(color.FgWhite, color.BgBlack)
+						mode = 0
+						line++
+						cursor.Hide()
+						refresh()
 					} else if line == tl.Len() {
 						if len(inp) > 0 {
 							tl.Append(task.New(tl.Len(), string(inp), false))
+
+							color.Set(color.FgWhite, color.BgBlack)
+							line++
+							refresh()
+
+							startInput()
+
+							inp = nil
+
 						} else {
-							line--
+							color.Set(color.FgWhite, color.BgBlack)
+							mode = 0
+							cursor.Hide()
+							refresh()
 						}
 					}
 
-					color.Set(color.FgRed, color.BgBlack)
-					mode = 0
-					line++
-					cursor.Hide()
-					refresh()
 				}
 			}
 		}
@@ -135,4 +143,13 @@ func fillLine() {
 	for i := 0; i < w-1; i++ {
 		fmt.Print(" ")
 	}
+}
+
+func startInput() {
+	cursor.Up(tl.Len() - line + 1)
+	color.Set(color.FgBlack, color.BgWhite)
+	fillLine()
+	cursor.Left(w - 1)
+	fmt.Printf("[ ]%d: ", line)
+	cursor.Show()
 }
