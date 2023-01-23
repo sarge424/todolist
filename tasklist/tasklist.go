@@ -9,13 +9,12 @@ type Tasklist struct {
 type tasknode struct {
 	task task.Task
 	sub  *Tasklist
+	prev *tasknode
 	next *tasknode
 }
 
 func New() *Tasklist {
 	tl := Tasklist{}
-	tl.first = nil
-
 	return &tl
 }
 
@@ -23,26 +22,20 @@ func (tl *Tasklist) Append(t task.Task) {
 	//make a node
 	nn := tasknode{}
 	nn.task = t
-	nn.next = nil
 
 	//connect the node
 	if tl.first == nil {
 		tl.first = &nn
 	} else {
 		tl.last().next = &nn
+		nn.prev = tl.last()
 	}
 }
 
-func (tl *Tasklist) Del(index int) {
-	if index == 0 {
-		tl.first = tl.first.next
-		return
-	}
-
-	node := tl.nodeAt(index)
+func (tl *Tasklist) Del(node *tasknode) {
 	if node != nil {
-		nx := node.next
-		tl.nodeAt(index - 1).next = nx
+		node.prev.next = node.next
+		node.next.prev = node.prev
 	}
 }
 

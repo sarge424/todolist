@@ -22,6 +22,7 @@ var line int
 
 var mode int //0 for view, 1 for edit
 var inp []byte
+var selected task.Task
 
 func init() {
 	tl = tasklist.New()
@@ -30,6 +31,7 @@ func init() {
 
 	w, h = consolesize.GetConsoleSize()
 	line = 0
+
 }
 
 func main() {
