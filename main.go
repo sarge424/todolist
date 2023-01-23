@@ -65,6 +65,9 @@ func main() {
 				} else if key.String() == "right" && line < tl.Len() {
 					tl.At(line).ShiftPriority(1)
 					refresh()
+				} else if key.String() == "tab" && line > 0 && line < tl.Len() {
+					tl.Nest(selected)
+					refresh()
 				} else if key.String() == "space" && line < tl.Len() {
 					tl.At(line).Toggle()
 					refresh()
@@ -145,8 +148,8 @@ func main() {
 func refresh() {
 	cls()
 	w, h = consolesize.GetConsoleSize()
-	tl.DeepDisplay(selected, w, 0)
-	tasklist.GetColor(0, line == tl.Len()).Println("  +  new")
+	tl.DeepDisplay(selected, w, "-->")
+	tasklist.GetColor(0, line == tl.Len()).Println("  +  new " + fmt.Sprint(line) + "(" + selected.Disp() + ")")
 }
 
 func cls() {
