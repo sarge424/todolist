@@ -56,6 +56,16 @@ func (tl *Tasklist) Len() int {
 	return i
 }
 
+func (tl *Tasklist) Swap(i1 int, i2 int) {
+	if i1 < 0 || i2 < 0 || i1 >= tl.Len() || i2 >= tl.Len() {
+		return
+	}
+
+	tmp := tl.nodeAt(i1).task
+	tl.nodeAt(i1).task = tl.nodeAt(i2).task
+	tl.nodeAt(i2).task = tmp
+}
+
 func (tl *Tasklist) At(index int) *task.Task {
 	i := 0
 	node := tl.first

@@ -49,6 +49,14 @@ func main() {
 				} else if key.String() == "down" && line < tl.Len() {
 					line++
 					refresh()
+				} else if key.String() == "shift+up" && line > 0 {
+					tl.Swap(line, line-1)
+					line--
+					refresh()
+				} else if key.String() == "shift+down" && line < tl.Len() {
+					tl.Swap(line, line+1)
+					line++
+					refresh()
 				} else if key.String() == "left" && line < tl.Len() {
 					tl.At(line).ShiftPriority(-1)
 					refresh()
