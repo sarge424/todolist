@@ -71,8 +71,11 @@ func main() {
 					refresh()
 				} else if key.String() == "enter" {
 					startInput()
-
 					inp = nil
+					if line < tl.Len() {
+						inp = []byte(tl.At(line).GetText())
+						fmt.Print(string(inp))
+					}
 					mode = 1
 				}
 			}
@@ -82,18 +85,25 @@ func main() {
 				if key.String() == "space" {
 					fmt.Print(" ")
 					inp = append(inp, byte(' '))
-				} else if key.String() == "backspace" && len(inp) > 0 {
-					cursor.Left(1)
-					fmt.Print(" ")
-					cursor.Left(1)
-					inp = inp[:len(inp)-1]
+				} else if key.String() == "backspace" {
+					if len(inp) > 0 {
+						cursor.Left(1)
+						fmt.Print(" ")
+						cursor.Left(1)
+						inp = inp[:len(inp)-1]
+					} else {
+						color.Set(color.FgWhite, color.BgBlack)
+						mode = 0
+						cursor.Hide()
+						refresh()
+					}
 				} else if key.Code == keys.RuneKey {
 					fmt.Print(key.String())
 					inp = append(inp, []byte(key.String())...)
 				}
 			} else {
 				if key.String() == "enter" {
-					if line < tl.Len() {
+					if line < tl.Len() && key.String() == "enter" {
 						tl.At(line).SetText(string(inp))
 
 						color.Set(color.FgWhite, color.BgBlack)

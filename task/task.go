@@ -19,6 +19,10 @@ func New(id int, tx string, d bool) Task {
 	return t
 }
 
+func (t *Task) GetText() string {
+	return t.text
+}
+
 func (t *Task) SetText(tx string) {
 	if len(tx) > 0 {
 		t.text = tx
