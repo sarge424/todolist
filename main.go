@@ -52,13 +52,17 @@ func main() {
 					updateLine(1)
 					refresh()
 				} else if key.String() == "shift+up" && line > 0 {
-					tl.Swap(selected, true)
-					updateLine(-1)
-					refresh()
+					l := -selected.GetPrev().Lines()
+					if tl.Swap(selected, true) {
+						updateLine(-1 + l)
+						refresh()
+					}
 				} else if key.String() == "shift+down" && line < tl.Len()-1 {
-					tl.Swap(selected, false)
-					updateLine(1)
-					refresh()
+					l := selected.GetNext().Lines()
+					if tl.Swap(selected, false) {
+						updateLine(1 + l)
+						refresh()
+					}
 				} else if key.String() == "left" && line < tl.Len() {
 					tl.At(line).ShiftPriority(-1)
 					refresh()
@@ -67,6 +71,9 @@ func main() {
 					refresh()
 				} else if key.String() == "tab" && line > 0 && line < tl.Len() {
 					tl.Nest(selected)
+					refresh()
+				} else if key.String() == "shift+tab" && line > 0 && line < tl.Len() {
+					//tl.DeNest(selected)
 					refresh()
 				} else if key.String() == "space" && line < tl.Len() {
 					tl.At(line).Toggle()

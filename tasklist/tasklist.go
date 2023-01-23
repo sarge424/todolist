@@ -64,21 +64,36 @@ func (tl *Tasklist) Len() int {
 	return i
 }
 
-func (tl *Tasklist) Swap(node *Tasknode, up bool) {
+func (tl *Tasklist) Swap(node *Tasknode, up bool) bool {
 	if node == nil {
-		return
+		return false
 	}
 
 	if up && node.prev != nil {
-		tmp := node.task
-		node.task = node.prev.task
-		node.prev.task = tmp
+		tmpt := node.prev.task
+		tmpl := node.prev.sub
 
+		node.prev.task = node.task
+		node.prev.sub = node.sub
+
+		node.task = tmpt
+		node.sub = tmpl
+
+		return true
 	} else if !up && node.next != nil {
-		tmp := node.next.task
+		tmpt := node.next.task
+		tmpl := node.next.sub
+
 		node.next.task = node.task
-		node.task = tmp
+		node.next.sub = node.sub
+
+		node.task = tmpt
+		node.sub = tmpl
+
+		return true
 	}
+
+	return false
 }
 
 func (tl *Tasklist) Nest(node *Tasknode) {
@@ -208,4 +223,20 @@ func (t *Tasknode) Disp() string {
 	}
 
 	return ""
+}
+
+func (t *Tasknode) Lines() int {
+	if t == nil || t.sub == nil {
+		return 0
+	} else {
+		return t.sub.Len()
+	}
+}
+
+func (t *Tasknode) GetPrev() *Tasknode {
+	return t.prev
+}
+
+func (t *Tasknode) GetNext() *Tasknode {
+	return t.next
 }
