@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"main/colors"
 	"main/task"
 	"main/tasklist"
 	"os"
@@ -47,20 +46,18 @@ func main() {
 
 			} else {
 				if key.String() == "up" && line > 0 {
-					line--
-					selected = tl.NodeAt(line)
+					updateLine(-1)
 					refresh()
 				} else if key.String() == "down" && line < tl.Len() {
-					line++
-					selected = tl.NodeAt(line)
+					updateLine(1)
 					refresh()
 				} else if key.String() == "shift+up" && line > 0 {
 					tl.Swap(selected, true)
-					line--
+					updateLine(-1)
 					refresh()
 				} else if key.String() == "shift+down" && line < tl.Len()-1 {
 					tl.Swap(selected, false)
-					line++
+					updateLine(1)
 					refresh()
 				} else if key.String() == "left" && line < tl.Len() {
 					tl.At(line).ShiftPriority(-1)
@@ -113,8 +110,7 @@ func main() {
 
 						color.Set(color.FgWhite, color.BgBlack)
 						mode = 0
-						line++
-						selected = tl.NodeAt(line)
+						updateLine(1)
 						cursor.Hide()
 						refresh()
 					} else if line == tl.Len() {
@@ -122,8 +118,7 @@ func main() {
 							tl.Append(task.New(tl.Len(), string(inp), false))
 
 							color.Set(color.FgWhite, color.BgBlack)
-							line++
-							selected = tl.NodeAt(line)
+							updateLine(1)
 							refresh()
 
 							startInput()
@@ -150,12 +145,8 @@ func main() {
 func refresh() {
 	cls()
 	w, h = consolesize.GetConsoleSize()
-
-	for l := 0; l < tl.Len(); l++ {
-		t := tl.At(l)
-		colors.GetColor(t.GetColor(), l == line).Println(t.GetString(w))
-	}
-	colors.GetColor(0, line == tl.Len()).Println("  +  new")
+	tl.DeepDisplay(selected, w, 0)
+	tasklist.GetColor(0, line == tl.Len()).Println("  +  new")
 }
 
 func cls() {
@@ -177,4 +168,9 @@ func startInput() {
 	cursor.Left(w - 1)
 	fmt.Printf("[ ]%d: ", line)
 	cursor.Show()
+}
+
+func updateLine(offset int) {
+	line += offset
+	selected = tl.NodeAt(line)
 }

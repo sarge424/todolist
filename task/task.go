@@ -47,7 +47,7 @@ func (t *Task) GetString(width int) string {
 	return string(ans[:width])
 }
 
-func (t *Task) GetColor() int {
+func (t *Task) GetColorIndex() int {
 	if t.done {
 		return 4
 	} else {
