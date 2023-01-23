@@ -38,14 +38,14 @@ func (tl *Tasklist) Del(index int) {
 		return
 	}
 
-	node := tl.At(index)
+	node := tl.nodeAt(index)
 	if node != nil {
 		nx := node.next
-		tl.At(index - 1).next = nx
+		tl.nodeAt(index - 1).next = nx
 	}
 }
 
-func (tl *Tasklist) Len(t task.Task) int {
+func (tl *Tasklist) Len() int {
 	i := 0
 	node := tl.first
 	for node != nil {
@@ -56,7 +56,18 @@ func (tl *Tasklist) Len(t task.Task) int {
 	return i
 }
 
-func (tl *Tasklist) At(index int) *tasknode {
+func (tl *Tasklist) At(index int) *task.Task {
+	i := 0
+	node := tl.first
+	for node != nil && i < index {
+		i++
+		node = node.next
+	}
+
+	return &node.task
+}
+
+func (tl *Tasklist) nodeAt(index int) *tasknode {
 	i := 0
 	node := tl.first
 	for node != nil && i < index {

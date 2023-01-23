@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/colors"
 	"main/task"
+	"main/tasklist"
 	"os"
 	"os/exec"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/nathan-fiscaletti/consolesize-go"
 )
 
-var tasklist []task.Task
+var tl *tasklist.Tasklist
 var w int
 var h int
 var line int
@@ -23,7 +24,7 @@ var mode int //0 for view, 1 for edit
 var inp []byte
 
 func init() {
-	tasklist = make([]task.Task, 0, 5)
+	tl = tasklist.New()
 	inp = nil
 	cursor.Hide()
 
@@ -45,23 +46,23 @@ func main() {
 				if key.String() == "up" && line > 0 {
 					line--
 					refresh()
-				} else if key.String() == "down" && line < len(tasklist) {
+				} else if key.String() == "down" && line < tl.Len() {
 					line++
 					refresh()
-				} else if key.String() == "left" && line < len(tasklist) {
-					tasklist[line].ShiftPriority(-1)
+				} else if key.String() == "left" && line < tl.Len() {
+					tl.At(line).ShiftPriority(-1)
 					refresh()
-				} else if key.String() == "right" && line < len(tasklist) {
-					tasklist[line].ShiftPriority(1)
+				} else if key.String() == "right" && line < tl.Len() {
+					tl.At(line).ShiftPriority(1)
 					refresh()
-				} else if key.String() == "space" && line < len(tasklist) {
-					tasklist[line].Toggle()
+				} else if key.String() == "space" && line < tl.Len() {
+					tl.At(line).Toggle()
 					refresh()
-				} else if key.String() == "backspace" && line < len(tasklist) {
-					tasklist = append(tasklist[:line], tasklist[line+1:]...)
+				} else if key.String() == "backspace" && line < tl.Len() {
+					tl.Del(line)
 					refresh()
 				} else if key.String() == "enter" {
-					cursor.Up(len(tasklist) - line + 1)
+					cursor.Up(tl.Len() - line + 1)
 					color.Set(color.FgBlack, color.BgWhite)
 					fillLine()
 					cursor.Left(w - 1)
@@ -89,11 +90,11 @@ func main() {
 				}
 			} else {
 				if key.String() == "enter" {
-					if line < len(tasklist) {
-						tasklist[line].SetText(string(inp))
-					} else if line == len(tasklist) {
+					if line < tl.Len() {
+						tl.At(line).SetText(string(inp))
+					} else if line == tl.Len() {
 						if len(inp) > 0 {
-							tasklist = append(tasklist, task.New(len(tasklist), string(inp), false))
+							tl.Append(task.New(tl.Len(), string(inp), false))
 						} else {
 							line--
 						}
@@ -117,10 +118,11 @@ func refresh() {
 	cls()
 	w, h = consolesize.GetConsoleSize()
 
-	for l, t := range tasklist {
+	for l := 0; l < tl.Len(); l++ {
+		t := tl.At(l)
 		colors.GetColor(t.GetColor(), l == line).Println(t.GetString(w))
 	}
-	colors.GetColor(0, line == len(tasklist)).Println("  +  new")
+	colors.GetColor(0, line == tl.Len()).Println("  +  new")
 }
 
 func cls() {
