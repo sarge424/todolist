@@ -8,6 +8,7 @@ type Tasklist struct {
 
 type tasknode struct {
 	task task.Task
+	sub  *Tasklist
 	next *tasknode
 }
 
@@ -50,6 +51,9 @@ func (tl *Tasklist) Len() int {
 	node := tl.first
 	for node != nil {
 		i++
+		if node.sub != nil {
+			i += node.sub.Len()
+		}
 		node = node.next
 	}
 

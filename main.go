@@ -53,7 +53,7 @@ func main() {
 					tl.Swap(line, line-1)
 					line--
 					refresh()
-				} else if key.String() == "shift+down" && line < tl.Len() {
+				} else if key.String() == "shift+down" && line < tl.Len()-1 {
 					tl.Swap(line, line+1)
 					line++
 					refresh()
