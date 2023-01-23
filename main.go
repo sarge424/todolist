@@ -57,6 +57,9 @@ func main() {
 				} else if key.String() == "space" && line < len(tasklist) {
 					tasklist[line].Toggle()
 					refresh()
+				} else if key.String() == "backspace" && line < len(tasklist) {
+					tasklist = append(tasklist[:line], tasklist[line+1:]...)
+					refresh()
 				} else if key.String() == "enter" {
 					cursor.Up(len(tasklist) - line + 1)
 					color.Set(color.FgBlack, color.BgWhite)
@@ -89,7 +92,11 @@ func main() {
 					if line < len(tasklist) {
 						tasklist[line].SetText(string(inp))
 					} else if line == len(tasklist) {
-						tasklist = append(tasklist, task.New(len(tasklist), string(inp), false))
+						if len(inp) > 0 {
+							tasklist = append(tasklist, task.New(len(tasklist), string(inp), false))
+						} else {
+							line--
+						}
 					}
 
 					color.Set(color.FgRed, color.BgBlack)
